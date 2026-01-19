@@ -2,16 +2,84 @@
 <html>
 <head>
   <title>College Exam Seat Planner</title>
-  <link rel="stylesheet" href="style.css">
+
   <style>
-    body { font-family: Arial; padding: 20px; background: #f4f6f9; }
-    h2 { color: #333; }
-    input, button, select { padding: 6px; margin: 5px; }
-    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
-    th, td { border: 1px solid #aaa; padding: 8px; text-align: center; }
-    th { background: #e2e3e9; }
-    .box { background: white; padding: 15px; margin-bottom: 20px; border-radius: 6px; }
-    .error { color: red; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      margin: 0;
+    }
+
+    h1 { text-align: center; color: white; }
+
+    .container { max-width: 1000px; margin: auto; }
+
+    .box {
+      background: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+
+    h2 { color: #4a3fa7; }
+
+    input, select {
+      padding: 8px;
+      margin: 6px 4px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .btn-add { background: #4caf50; color: white; }
+    .btn-add:hover { background: #43a047; }
+
+    .btn-del { background: #e53935; color: white; }
+    .btn-del:hover { background: #c62828; }
+
+    .btn-alloc { background: #1e88e5; color: white; }
+    .btn-alloc:hover { background: #1565c0; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th {
+      background: #5c6bc0;
+      color: white;
+      padding: 10px;
+    }
+
+    td {
+      padding: 8px;
+      text-align: center;
+      background: #f9f9ff;
+    }
+
+    tr:nth-child(even) td { background: #eef0ff; }
+
+    .error { color: red; margin-top: 8px; }
+
+    #result {
+      margin-top: 10px;
+      padding: 10px;
+      background: #e8f5e9;
+      border-radius: 8px;
+      border: 1px solid #a5d6a7;
+    }
   </style>
 </head>
 
@@ -19,22 +87,30 @@
 
 <h1>🎓 College Exam Seat Planner</h1>
 
+<div class="container">
+
 <!-- ADD CLASSROOM -->
 <div class="box">
   <h2>Add Classroom</h2>
 
-  Room ID: <input id="roomId" required>
-  Capacity: <input id="capacity" type="number" required>
-  Floor No: <input id="floorNo" type="number" required>
+  Room ID:
+  <input id="roomId" placeholder="A101">
+
+  Capacity:
+  <input id="capacity" type="number" placeholder="40">
+
+  Floor No:
+  <input id="floorNo" type="number" placeholder="1">
+
   Near Washroom:
-  <select id="nearWashroom" required>
+  <select id="nearWashroom">
     <option value="">Select</option>
     <option value="true">True</option>
     <option value="false">False</option>
   </select>
 
   <br>
-  <button onclick="addRoom()">Add</button>
+  <button class="btn-add" onclick="addRoom()">➕ Add Classroom</button>
   <div id="msg" class="error"></div>
 </div>
 
@@ -58,11 +134,16 @@
 <!-- ALLOCATE EXAM -->
 <div class="box">
   <h2>Allocate Exam Seats</h2>
-  Total Students: <input id="students" type="number" required>
-  <button onclick="allocate()">Allocate</button>
+
+  Total Students:
+  <input id="students" type="number" placeholder="Enter total students">
+
+  <button class="btn-alloc" onclick="allocate()">🎯 Allocate</button>
 
   <h3>Allocation Result</h3>
   <div id="result"></div>
+</div>
+
 </div>
 
 <script>
@@ -82,14 +163,13 @@
 
     document.getElementById("msg").innerText = "";
 
-    let room = {
+    classrooms.push({
       roomId: roomId,
       capacity: parseInt(capacity),
       floorNo: parseInt(floorNo),
       nearWashroom: nearWashroom === "true"
-    };
+    });
 
-    classrooms.push(room);
     displayRooms();
     clearForm();
   }
@@ -113,13 +193,12 @@
           <td>${r.floorNo}</td>
           <td>${r.nearWashroom}</td>
           <td>
-            <button onclick="deleteRoom(${index})">Delete</button>
+            <button class="btn-del" onclick="deleteRoom(${index})">Delete</button>
           </td>
         </tr>`;
     });
   }
 
-  // ✅ Delete Function
   function deleteRoom(index) {
     classrooms.splice(index, 1);
     displayRooms();
@@ -150,18 +229,18 @@
     resultDiv.innerHTML = "";
 
     if (seats < totalStudents) {
-      resultDiv.innerHTML = "<b style='color:red'>Not enough seats available</b>";
+      resultDiv.innerHTML = "<b style='color:red'>❌ Not enough seats available</b>";
       return;
     }
 
-    resultDiv.innerHTML = "<b>Allocated Classrooms:</b><br><br>";
+    resultDiv.innerHTML = "<b>✅ Allocated Classrooms:</b><br><br>";
 
     allocated.forEach(r => {
       resultDiv.innerHTML +=
-        `Room: ${r.roomId}, Floor: ${r.floorNo}, Near Washroom: ${r.nearWashroom}<br>`;
+        `Room: <b>${r.roomId}</b>, Floor: ${r.floorNo}, Near Washroom: ${r.nearWashroom}<br>`;
     });
 
-    resultDiv.innerHTML += `<br>Total Capacity: ${seats}`;
+    resultDiv.innerHTML += `<br><b>Total Capacity:</b> ${seats}`;
   }
 </script>
 
