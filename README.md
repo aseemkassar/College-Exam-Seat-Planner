@@ -43,6 +43,7 @@ This system automates the process and ensures:
 
 https://illustrious-meringue-9ad722.netlify.app/
 
-## 👨‍💻 Developed By
+##  Developed By
 Mohd Aseem  
 B.Tech (CSE)
+
