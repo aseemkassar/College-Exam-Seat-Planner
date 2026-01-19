@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>College Exam Seat Planner</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { font-family: Arial; padding: 20px; background: #f4f6f9; }
+    h2 { color: #333; }
+    input, button, select { padding: 6px; margin: 5px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    th, td { border: 1px solid #aaa; padding: 8px; text-align: center; }
+    th { background: #e2e3e9; }
+    .box { background: white; padding: 15px; margin-bottom: 20px; border-radius: 6px; }
+    .error { color: red; }
+  </style>
+</head>
+
+<body>
+
+<h1>🎓 College Exam Seat Planner</h1>
+
+<!-- ADD CLASSROOM -->
+<div class="box">
+  <h2>Add Classroom</h2>
+
+  Room ID: <input id="roomId" required>
+  Capacity: <input id="capacity" type="number" required>
+  Floor No: <input id="floorNo" type="number" required>
+  Near Washroom:
+  <select id="nearWashroom" required>
+    <option value="">Select</option>
+    <option value="true">True</option>
+    <option value="false">False</option>
+  </select>
+
+  <br>
+  <button onclick="addRoom()">Add</button>
+  <div id="msg" class="error"></div>
+</div>
+
+<!-- VIEW CLASSROOMS -->
+<div class="box">
+  <h2>All Classrooms</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Room ID</th>
+        <th>Capacity</th>
+        <th>Floor</th>
+        <th>Near Washroom</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="roomTable"></tbody>
+  </table>
+</div>
+
+<!-- ALLOCATE EXAM -->
+<div class="box">
+  <h2>Allocate Exam Seats</h2>
+  Total Students: <input id="students" type="number" required>
+  <button onclick="allocate()">Allocate</button>
+
+  <h3>Allocation Result</h3>
+  <div id="result"></div>
+</div>
+
+<script>
+  let classrooms = [];
+
+  function addRoom() {
+    let roomId = document.getElementById("roomId").value.trim();
+    let capacity = document.getElementById("capacity").value;
+    let floorNo = document.getElementById("floorNo").value;
+    let nearWashroom = document.getElementById("nearWashroom").value;
+
+    // ✅ Validation
+    if (roomId === "" || capacity === "" || floorNo === "" || nearWashroom === "") {
+      document.getElementById("msg").innerText = "⚠ Please fill all fields!";
+      return;
+    }
+
+    document.getElementById("msg").innerText = "";
+
+    let room = {
+      roomId: roomId,
+      capacity: parseInt(capacity),
+      floorNo: parseInt(floorNo),
+      nearWashroom: nearWashroom === "true"
+    };
+
+    classrooms.push(room);
+    displayRooms();
+    clearForm();
+  }
+
+  function clearForm() {
+    document.getElementById("roomId").value = "";
+    document.getElementById("capacity").value = "";
+    document.getElementById("floorNo").value = "";
+    document.getElementById("nearWashroom").value = "";
+  }
+
+  function displayRooms() {
+    let table = document.getElementById("roomTable");
+    table.innerHTML = "";
+
+    classrooms.forEach((r, index) => {
+      table.innerHTML += `
+        <tr>
+          <td>${r.roomId}</td>
+          <td>${r.capacity}</td>
+          <td>${r.floorNo}</td>
+          <td>${r.nearWashroom}</td>
+          <td>
+            <button onclick="deleteRoom(${index})">Delete</button>
+          </td>
+        </tr>`;
+    });
+  }
+
+  // ✅ Delete Function
+  function deleteRoom(index) {
+    classrooms.splice(index, 1);
+    displayRooms();
+  }
+
+  function allocate() {
+    let totalStudents = document.getElementById("students").value;
+
+    if (totalStudents === "") {
+      alert("Enter total students!");
+      return;
+    }
+
+    totalStudents = parseInt(totalStudents);
+
+    let sorted = [...classrooms].sort((a, b) => a.floorNo - b.floorNo);
+
+    let allocated = [];
+    let seats = 0;
+
+    for (let room of sorted) {
+      if (seats >= totalStudents) break;
+      allocated.push(room);
+      seats += room.capacity;
+    }
+
+    let resultDiv = document.getElementById("result");
+    resultDiv.innerHTML = "";
+
+    if (seats < totalStudents) {
+      resultDiv.innerHTML = "<b style='color:red'>Not enough seats available</b>";
+      return;
+    }
+
+    resultDiv.innerHTML = "<b>Allocated Classrooms:</b><br><br>";
+
+    allocated.forEach(r => {
+      resultDiv.innerHTML +=
+        `Room: ${r.roomId}, Floor: ${r.floorNo}, Near Washroom: ${r.nearWashroom}<br>`;
+    });
+
+    resultDiv.innerHTML += `<br>Total Capacity: ${seats}`;
+  }
+</script>
+
+</body>
+</html>
